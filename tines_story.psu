@@ -7,9 +7,9 @@ BEGIN OktaWebhookListener
         IF request received
             events = extract event data from request
             
-            IF events is successful
-                check_db_tables()
-                user = fetch okta_user info using event.userid
+            IF events is successful #Trigger
+                check_db_tables() #List DynamoDB Tables
+                user = fetch okta_user info using event.userid #get_okta_user
                 FOR each entry event in events
                     store_and_notify(event,user)
                 END FOR
@@ -26,12 +26,12 @@ END FUNCTION
 
 # Define function to save data to database 
 BEGIN store_and_notify(event, user)
-    payload = parse data to db table schema
-    IF user.status is "PROVISIONED" OR "STAGED"
+    payload = parse data to db table schema #Get User Details
+    IF user.status is "PROVISIONED" OR "STAGED" #Trigger
         store payload in database table "joiners"
-    ELSE IF user.status is "ACTIVE"
+    ELSE IF user.status is "ACTIVE" # Trigger
         store payload in database table "movers"
-    ELSE IF user.status is "SUSPENDED" OR "DEPROVISIONED"
+    ELSE IF user.status is "SUSPENDED" OR "DEPROVISIONED" #Trigger
         store payload in database table "leavers"
     END IF
     call slack_notify(user)
