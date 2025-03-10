@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph SG2[AWS]
+    DB[(Dynamo DB)]
+    end
+    subgraph SG1[Okta]
+    A@{ shape: processes, label: "Lifecycle Event" } --> B(Event Hook)
+    B -->C@{ shape: diamond, label: "[Event Hook Filter] Joiner|mover|leaver?" }
+    end
+    C -->|Yes|D[Webhook Event Listener]
+    subgraph SG3[Tines]
+    D -->|Event Payload| E@{ shape: subproc, label: "Process Event" }
+    end
+    E -->|Save to DB| DB
+    subgraph SG5[Slack]
+    E -->|Notify to channel| F@{ shape: stadium, label: "Slack" }
+    end
+    %% DB[(Database)]
+    subgraph SG4[Grafana]
+    DB -->|Read Tables|G@{ shape: stadium, label: "Grafana" }
+    H@{ shape: curv-trap, label: "Dashboard" } -->G
+    end
+    I@{ icon: "fa:user", form: "square", label: "User", pos: "t", h: 60 } -->|go to dashboard page| H
+    C -->|No|N@{ shape: dbl-circ, label: "Stop" }
+  
+
+%% Define styles for subgraphs
+    classDef oktaStyle fill:#1b7ad6,stroke:#333,stroke-width:2px
+    classDef grafanaStyle fill:#ff8d33,stroke:#333,stroke-width:2px
+    classDef awsStyle fill:#ffbd33,stroke:#333,stroke-width:2px
+    classDef tinesStyle fill:#dac5eb,stroke:#333,stroke-width:2px
+    classDef slackStyle fill:#E01E5A,stroke:#333,stroke-width:2px
+
+    %% Apply styles to subgraphs
+    class SG1 oktaStyle
+    class SG2 awsStyle
+    class SG3 tinesStyle
+    class SG4 grafanaStyle
+    class SG5 slackStyle
+
+    
