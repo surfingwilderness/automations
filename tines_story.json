@@ -15,8 +15,8 @@
       "guid": "35a3d5bc4917fc557762d81465f27076",
       "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
       "options": {
-        "path": "b218a3b7c270bb1ca9ccdd69627bde68",
-        "secret": "e44a13c80cf23da8cc50ea4c6f8d6838",
+        "path": "",
+        "secret": "",
         "verbs": "get,post",
         "response_headers": {},
         "response": "OK"
