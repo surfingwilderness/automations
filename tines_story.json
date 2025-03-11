@@ -1,0 +1,1067 @@
+{
+  "schema_version": 26,
+  "standard_lib_version": 78,
+  "action_runtime_version": 30,
+  "name": "Lifecycle Notifications",
+  "description": "",
+  "guid": "b79e8a7e2239015a75867edb396ea1c3",
+  "slug": "lifecycle_notifications",
+  "agents": [
+    {
+      "type": "Agents::WebhookAgent",
+      "name": "Okta Webhook",
+      "disabled": false,
+      "description": null,
+      "guid": "35a3d5bc4917fc557762d81465f27076",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "path": "b218a3b7c270bb1ca9ccdd69627bde68",
+        "secret": "e44a13c80cf23da8cc50ea4c6f8d6838",
+        "verbs": "get,post",
+        "response_headers": {},
+        "response": "OK"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::EventTransformationAgent",
+      "name": "API Response",
+      "disabled": false,
+      "description": null,
+      "guid": "a676b44d188212638f982911fc10b04c",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "mode": "message_only",
+        "loop": false,
+        "payload": {
+          "verification": "<<okta_webhook.headers.x_okta_verification_challenge>>"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "Send a message using a Slack channel webhook",
+      "disabled": false,
+      "description": "Use a custom Slack app; this template is not supported by Tines bot for Slack. Send a message to a given Slack Channel using a webhook URL configured in your Slack Workspace. No credentials are required for this method.\n\nLink to documentation: https://api.slack.com/messaging/webhooks",
+      "guid": "d83119fdf26524c511eeb0158eb8d253",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "<<INPUT.channel_webhook_url>>",
+        "content_type": "application_json",
+        "method": "post",
+        "payload": {
+          "text": "<<INPUT.message>>"
+        },
+        "headers": {}
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "484d3c3ba740c02e56b465eea139fa492c38a7011986bb5525a680e3d424661a",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::EventTransformationAgent",
+      "name": "Get User Details",
+      "disabled": false,
+      "description": null,
+      "guid": "03c2ccc30105d14d437f9622c6549571",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "mode": "message_only",
+        "loop": false,
+        "payload": {
+          "email": "<<explode_events.event.target[0].alternateId>>",
+          "display_name": "<<explode_events.event.target[0].displayName>>",
+          "event": "<<explode_events.event.eventType>>",
+          "timestamp": "<<explode_events.event.published>>",
+          "event_message": "<<explode_events.event.displayMessage>>",
+          "group": "<<explode_events.event.target[1].displayName>>",
+          "eventId": "<<explode_events.event.uuid>>",
+          "team": "<<get_okta_user.body.profile.team>>",
+          "department": "<<get_okta_user.body.profile.department>>",
+          "title": "<<get_okta_user.body.profile.title>>",
+          "profile_change": "<<explode_events.event.debugContext.debugData.changedAttributes>>"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "List DynamoDB Tables",
+      "disabled": false,
+      "description": "Returns an array of table names associated with the current account and endpoint. The output from ListTables is paginated, with each page returning a maximum of 100 table names.",
+      "guid": "5e7848993d8ae61197b35b20e282d40e",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {},
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.ListTables"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "8238cb1c9b7b147d714ffccadeb6e1bf7a6bbaa4c0955ad9a092079ea2371110",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Joiners Table Exists",
+      "disabled": false,
+      "description": null,
+      "guid": "cf2a17cfe01f7ed7dba2c88446f475d4",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "=list_dynamodb_tables.body.TableNames",
+            "type": "in",
+            "value": "tines_joiners"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "Create Joiners DynamoDB Table",
+      "disabled": false,
+      "description": "Adds a new table to your account. The table name must be unique among those associated with the AWS Account issuing the request, and the AWS Region that receives the request (e.g. us-east-1). The CreateTable operation triggers an asynchronous workflow to begin creating the table. Amazon DynamoDB immediately returns the state of the table (CREATING) until the table is in the ACTIVE state. Once the table is in the ACTIVE state, you can perform data plane operations.",
+      "guid": "ab1a6b61367aa00d7d2bf04cc07103eb",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "KeySchema": [
+            {
+              "KeyType": "HASH",
+              "AttributeName": "eventId"
+            }
+          ],
+          "TableName": "tines_joiners",
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "eventId",
+              "AttributeType": "S"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "WriteCapacityUnits": 5,
+            "ReadCapacityUnits": 5
+          }
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.CreateTable"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "3a4a0e3d97b12135af46b39412a4de39569d5dc7c28a49430aa1c33b92726704",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Movers Table Exists",
+      "disabled": false,
+      "description": null,
+      "guid": "aa257fef67616d0ba1a1bd52353ce0e5",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "=list_dynamodb_tables.body.TableNames",
+            "type": "in",
+            "value": "tines_movers"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Leavers Table Exists",
+      "disabled": false,
+      "description": null,
+      "guid": "9e50a4aeb323791fd5b3a3f30a2daa93",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "=list_dynamodb_tables.body.TableNames",
+            "type": "in",
+            "value": "tines_leavers"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "get_okta_user",
+      "disabled": false,
+      "description": "Retrieve a User\n\nLink to documentation:\nhttps://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/getUser",
+      "guid": "ae6808e16fc84494e795f6739472f7b4",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://<<INPUT.okta_domain>>/api/v1/users/<<INPUT.user_id>>",
+        "content_type": "application_json",
+        "method": "get",
+        "headers": {
+          "Authorization": "SSWS <<INPUT.okta_credential>>"
+        },
+        "payload": "=LOCAL.final_payload",
+        "local": {
+          "optional_parameters": {
+            "expand": "=INPUT.expand"
+          },
+          "final_payload": "=REJECT(\n  LOCAL.optional_parameters,\n  LAMBDA(\n    item,\n    OR(\n      item = NULL,\n      IF(\n        OR(\n          TYPE(item) = \"TrueClass\",\n          TYPE(item) = \"FalseClass\",\n          TYPE(item) = \"Integer\"\n        ),\n        IS_EMPTY(TEXT(item)),\n        IS_EMPTY(item)\n      )\n    )\n  )\n)"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "bdf507b93f0170149a0b4431705990c17f87a3234c79c647d3697327931dc4ec",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "if success",
+      "disabled": false,
+      "description": null,
+      "guid": "07cf56b105c8d309cd5745158492bf2b",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "<<okta_webhook.body.data.events[0].outcome.result>>",
+            "type": "field==value",
+            "value": "SUCCESS"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "(PROVISIONED|STAGED)",
+      "disabled": false,
+      "description": null,
+      "guid": "2846783abaad697603163b2b022c886b",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "<<get_okta_user.body.status>>",
+            "type": "regex",
+            "value": "^(PROVISIONED|STAGED)$",
+            "case_sensitive": true
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "ACTIVE",
+      "disabled": false,
+      "description": null,
+      "guid": "ba15f358e1ccdbe447423e508d1623c7",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "type": "field==value",
+            "value": "ACTIVE",
+            "path": "<<get_okta_user.body.status>>"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "add item to movers",
+      "disabled": false,
+      "description": "Creates a new item, or replaces an old item with a new item. If an item that has the same primary key as the new item already exists in the specified table, the new item completely replaces the existing item. You can perform a conditional put operation (add a new item if one with the specified primary key doesn't exist), or replace an existing item if it has certain attribute values. You can return the item's attribute values in the same operation, using the ReturnValues parameter.",
+      "guid": "9a1cfb42e17c37d08cb927f5c2ad6ee7",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "Item": {
+            "eventId": {
+              "S": "<<get_user_details.eventId>>"
+            },
+            "eventType": {
+              "S": "<<get_user_details.event>>"
+            },
+            "timestamp": {
+              "S": "<<get_user_details.timestamp>>"
+            },
+            "username": {
+              "S": "<<get_user_details.email>>"
+            },
+            "displayName": {
+              "S": "<<get_user_details.display_name>>"
+            },
+            "groupChange": {
+              "S": "<<get_user_details.group>>"
+            },
+            "profileChange": {
+              "S": "<<get_user_details.profile_change>>"
+            },
+            "title": {
+              "S": "<<get_user_details.title>>"
+            },
+            "department": {
+              "S": "<<get_user_details.department>>"
+            },
+            "team": {
+              "S": "<<get_user_details.team>>"
+            }
+          },
+          "TableName": "tines_movers"
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.PutItem"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "e27491f5e75a266d7ab143df67c4d790baf62f2b64e9e20cb8787968f360a4a6",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "INACTIVE",
+      "disabled": false,
+      "description": null,
+      "guid": "8e2aea209c27c7c5323d7ce6549e6f84",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "rules": [
+          {
+            "path": "<<get_okta_user.body.status>>",
+            "type": "regex",
+            "value": "^(SUSPENDED|DEPROVISIONED)$",
+            "case_sensitive": true
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "Create Movers DynamoDB Table",
+      "disabled": false,
+      "description": "Adds a new table to your account. The table name must be unique among those associated with the AWS Account issuing the request, and the AWS Region that receives the request (e.g. us-east-1). The CreateTable operation triggers an asynchronous workflow to begin creating the table. Amazon DynamoDB immediately returns the state of the table (CREATING) until the table is in the ACTIVE state. Once the table is in the ACTIVE state, you can perform data plane operations.",
+      "guid": "1a95397b230c038afe7859937bfd4c3a",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "KeySchema": [
+            {
+              "KeyType": "HASH",
+              "AttributeName": "eventId"
+            }
+          ],
+          "TableName": "tines_movers",
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "eventId",
+              "AttributeType": "S"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "WriteCapacityUnits": 5,
+            "ReadCapacityUnits": 5
+          }
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.CreateTable"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "3a4a0e3d97b12135af46b39412a4de39569d5dc7c28a49430aa1c33b92726704",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "Create Leavers DynamoDB Table",
+      "disabled": false,
+      "description": "Adds a new table to your account. The table name must be unique among those associated with the AWS Account issuing the request, and the AWS Region that receives the request (e.g. us-east-1). The CreateTable operation triggers an asynchronous workflow to begin creating the table. Amazon DynamoDB immediately returns the state of the table (CREATING) until the table is in the ACTIVE state. Once the table is in the ACTIVE state, you can perform data plane operations.",
+      "guid": "6d30885f8ec5610f7c7f3c5389392355",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "KeySchema": [
+            {
+              "KeyType": "HASH",
+              "AttributeName": "eventId"
+            }
+          ],
+          "TableName": "tines_leavers",
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "eventId",
+              "AttributeType": "S"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "WriteCapacityUnits": 5,
+            "ReadCapacityUnits": 5
+          }
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.CreateTable"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "3a4a0e3d97b12135af46b39412a4de39569d5dc7c28a49430aa1c33b92726704",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "add item to joiners",
+      "disabled": false,
+      "description": "Creates a new item, or replaces an old item with a new item. If an item that has the same primary key as the new item already exists in the specified table, the new item completely replaces the existing item. You can perform a conditional put operation (add a new item if one with the specified primary key doesn't exist), or replace an existing item if it has certain attribute values. You can return the item's attribute values in the same operation, using the ReturnValues parameter.",
+      "guid": "71f4ca296717afddc289ea0baffb691e",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "Item": {
+            "eventId": {
+              "S": "<<get_user_details.eventId>>"
+            },
+            "eventType": {
+              "S": "<<get_user_details.event>>"
+            },
+            "timestamp": {
+              "S": "<<get_user_details.timestamp>>"
+            },
+            "username": {
+              "S": "<<get_user_details.email>>"
+            },
+            "displayName": {
+              "S": "<<get_user_details.display_name>>"
+            },
+            "groupChange": {
+              "S": "<<get_user_details.group>>"
+            },
+            "profileChange": {
+              "S": "<<get_user_details.profile_change>>"
+            },
+            "title": {
+              "S": "<<get_user_details.title>>"
+            },
+            "department": {
+              "S": "<<get_user_details.department>>"
+            },
+            "team": {
+              "S": "<<get_user_details.team>>"
+            }
+          },
+          "TableName": "tines_joiners"
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.PutItem"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "e27491f5e75a266d7ab143df67c4d790baf62f2b64e9e20cb8787968f360a4a6",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "add item to leavers",
+      "disabled": false,
+      "description": "Creates a new item, or replaces an old item with a new item. If an item that has the same primary key as the new item already exists in the specified table, the new item completely replaces the existing item. You can perform a conditional put operation (add a new item if one with the specified primary key doesn't exist), or replace an existing item if it has certain attribute values. You can return the item's attribute values in the same operation, using the ReturnValues parameter.",
+      "guid": "16b344bc6538753717367faf2a6908b7",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "url": "https://dynamodb.us-east-2.amazonaws.com",
+        "method": "post",
+        "content_type": "application_json",
+        "payload": {
+          "Item": {
+            "eventId": {
+              "S": "<<get_user_details.eventId>>"
+            },
+            "eventType": {
+              "S": "<<get_user_details.event>>"
+            },
+            "timestamp": {
+              "S": "<<get_user_details.timestamp>>"
+            },
+            "username": {
+              "S": "<<get_user_details.email>>"
+            },
+            "displayName": {
+              "S": "<<get_user_details.display_name>>"
+            },
+            "groupChange": {
+              "S": "<<get_user_details.group>>"
+            },
+            "title": {
+              "S": "<<get_user_details.title>>"
+            },
+            "department": {
+              "S": "<<get_user_details.department>>"
+            },
+            "team": {
+              "S": "<<get_user_details.team>>"
+            }
+          },
+          "TableName": "tines_leavers"
+        },
+        "headers": {
+          "Authorization": "<<CREDENTIAL.aws_dynamodb>>",
+          "X-Amz-Target": "DynamoDB_20120810.PutItem"
+        }
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": "e27491f5e75a266d7ab143df67c4d790baf62f2b64e9e20cb8787968f360a4a6",
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::EventTransformationAgent",
+      "name": "Explode events",
+      "disabled": false,
+      "description": null,
+      "guid": "8e037e0294ab7c4359e196b59cb183de",
+      "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+      "options": {
+        "mode": "explode",
+        "path": "=okta_webhook.body.data.events",
+        "to": "event",
+        "limit": "500"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null,
+        "template_tags": []
+      },
+      "width": null,
+      "schedule": null
+    }
+  ],
+  "diagram_notes": [],
+  "links": [
+    {
+      "source": 0,
+      "receiver": 1
+    },
+    {
+      "source": 0,
+      "receiver": 10
+    },
+    {
+      "source": 3,
+      "receiver": 11
+    },
+    {
+      "source": 3,
+      "receiver": 12
+    },
+    {
+      "source": 3,
+      "receiver": 14
+    },
+    {
+      "source": 4,
+      "receiver": 5
+    },
+    {
+      "source": 4,
+      "receiver": 7
+    },
+    {
+      "source": 4,
+      "receiver": 8
+    },
+    {
+      "source": 5,
+      "receiver": 6,
+      "link_type": "secondary"
+    },
+    {
+      "source": 7,
+      "receiver": 15,
+      "link_type": "secondary"
+    },
+    {
+      "source": 8,
+      "receiver": 16,
+      "link_type": "secondary"
+    },
+    {
+      "source": 9,
+      "receiver": 19
+    },
+    {
+      "source": 10,
+      "receiver": 4
+    },
+    {
+      "source": 10,
+      "receiver": 9
+    },
+    {
+      "source": 11,
+      "receiver": 2
+    },
+    {
+      "source": 11,
+      "receiver": 17
+    },
+    {
+      "source": 12,
+      "receiver": 2
+    },
+    {
+      "source": 12,
+      "receiver": 13
+    },
+    {
+      "source": 14,
+      "receiver": 2
+    },
+    {
+      "source": 14,
+      "receiver": 18
+    },
+    {
+      "source": 19,
+      "receiver": 3
+    }
+  ],
+  "diagram_layout": "{\"35a3d5bc4917fc557762d81465f27076\":[-60,-345],\"a676b44d188212638f982911fc10b04c\":[180,-270],\"d83119fdf26524c511eeb0158eb8d253\":[-555,375],\"03c2ccc30105d14d437f9622c6549571\":[-60,165],\"5e7848993d8ae61197b35b20e282d40e\":[225,-150],\"cf2a17cfe01f7ed7dba2c88446f475d4\":[225,-30],\"ab1a6b61367aa00d7d2bf04cc07103eb\":[240,45],\"aa257fef67616d0ba1a1bd52353ce0e5\":[450,-30],\"9e50a4aeb323791fd5b3a3f30a2daa93\":[690,-60],\"ae6808e16fc84494e795f6739472f7b4\":[-60,-120],\"07cf56b105c8d309cd5745158492bf2b\":[-60,-225],\"2846783abaad697603163b2b022c886b\":[-270,300],\"ba15f358e1ccdbe447423e508d1623c7\":[-45,300],\"9a1cfb42e17c37d08cb927f5c2ad6ee7\":[-45,375],\"8e2aea209c27c7c5323d7ce6549e6f84\":[150,300],\"1a95397b230c038afe7859937bfd4c3a\":[465,45],\"6d30885f8ec5610f7c7f3c5389392355\":[705,45],\"71f4ca296717afddc289ea0baffb691e\":[-270,375],\"16b344bc6538753717367faf2a6908b7\":[255,375],\"8e037e0294ab7c4359e196b59cb183de\":[-60,30]}",
+  "send_to_story_enabled": false,
+  "entry_agent_guid": null,
+  "exit_agent_guids": [],
+  "api_entry_action_guids": [
+    "35a3d5bc4917fc557762d81465f27076"
+  ],
+  "api_exit_action_guids": [
+    "a676b44d188212638f982911fc10b04c"
+  ],
+  "keep_events_for": 86400,
+  "reporting_status": true,
+  "send_to_story_access": null,
+  "story_library_metadata": {},
+  "parent_only_send_to_story": false,
+  "monitor_failures": false,
+  "send_to_stories": [],
+  "recipients": [
+    "buzam5500@gmail.com"
+  ],
+  "synchronous_webhooks_enabled": true,
+  "send_to_story_access_source": 0,
+  "send_to_story_skill_use_requires_confirmation": true,
+  "pages": [],
+  "tags": [],
+  "time_saved_unit": "minutes",
+  "time_saved_value": 0,
+  "origin_story_identifier": "cloud:fec0ea41fe8bfa0ddb21160d852a5b3f:b79e8a7e2239015a75867edb396ea1c3",
+  "integration_product": null,
+  "integration_vendor": null,
+  "llm_product_instructions": "",
+  "exported_at": "2025-03-11T00:10:08Z",
+  "icon": ":simple_weather_api:",
+  "integrations": [
+    {
+      "action_inputs": [
+        {
+          "name": "Okta credential",
+          "description": "",
+          "required": true,
+          "type": "CREDENTIAL",
+          "ranking": 0,
+          "value": "\"=CREDENTIAL.okta\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": false,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "\"{}\""
+        },
+        {
+          "name": "User id",
+          "description": "ID of an existing Okta user",
+          "required": true,
+          "type": "TEXT",
+          "ranking": 1073741824,
+          "value": "\"<<okta_webhook.body.data.events[0].target[0].id>>\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": false,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "\"{}\""
+        },
+        {
+          "name": "Okta domain",
+          "description": "Your Okta domain",
+          "required": true,
+          "type": "TEXT",
+          "ranking": 1610612736,
+          "value": "\"trial-3556670.okta.com\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": false,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "\"{}\""
+        },
+        {
+          "name": "Expand",
+          "description": "An optional parameter to include metadata in the `_embedded` attribute. Valid value: `blocks`",
+          "required": false,
+          "type": "TEXT",
+          "ranking": 1879048192,
+          "value": "\"\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": true,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "\"{}\""
+        }
+      ],
+      "action_guid": "ae6808e16fc84494e795f6739472f7b4",
+      "product": "Okta",
+      "action_options_keys": []
+    },
+    {
+      "action_inputs": [
+        {
+          "name": "Channel webhook URL",
+          "description": "See https://api.slack.com/messaging/webhooks for further information on how to create a channel webhook URL.",
+          "required": true,
+          "type": "TEXT",
+          "ranking": 0,
+          "value": "\"https://hooks.slack.com/services/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\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": false,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "{}"
+        },
+        {
+          "name": "Message",
+          "description": "Use plain text, or Slack formatting markup: https://slack.com/help/articles/202288908-Format-your-messages#Markup.",
+          "required": true,
+          "type": "TEXT",
+          "ranking": 1073741824,
+          "value": "\"*New Okta Lifecycle Event*\\n*Event:* <<get_user_details.event>>\\n*Details:* <<get_user_details.event_message>>\\n*User:* <<get_user_details.display_name>>(<<get_user_details.email>>)\\n<<IF(IS_BLANK(get_user_details.group),null,\\\"*GROUP:* \\\" & get_user_details. group& \\\"\\\")>>\\n*Timestamp:* <<get_user_details.timestamp>><<>>\\n\"",
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "is_collapsed": false,
+          "sub_type": "HTML",
+          "multi_select_enabled": false,
+          "llm_json_schema": "{}"
+        }
+      ],
+      "action_guid": "d83119fdf26524c511eeb0158eb8d253",
+      "product": "Slack",
+      "action_options_keys": []
+    }
+  ]
+}
